@@ -1,4 +1,5 @@
 
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Selu383.SP25.P02.Api.Data;
 
@@ -20,6 +21,7 @@ namespace Selu383.SP25.P02.Api
 
             var app = builder.Build();
 
+
             using (var scope = app.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<DataContext>();
@@ -35,6 +37,7 @@ namespace Selu383.SP25.P02.Api
 
             app.UseHttpsRedirection();
 
+            app.UseAuthorization();
             app.UseAuthorization();
 
 
