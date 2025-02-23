@@ -1,6 +1,6 @@
 ﻿using Azure.Identity;
 using Microsoft.EntityFrameworkCore;
-using Selu383.SP25.P02.Api.Features.User;
+using Selu383.SP25.P02.Api.Features;
 
 namespace Selu383.SP25.P02.Api.Data
 {
