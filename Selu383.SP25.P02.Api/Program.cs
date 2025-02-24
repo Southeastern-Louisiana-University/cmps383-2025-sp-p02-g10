@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Selu383.SP25.P02.Api.Data;
 using Selu383.SP25.P02.Api.Features;
+using Microsoft.OpenApi.Models;
 
 namespace Selu383.SP25.P02.Api
 {
@@ -16,12 +17,24 @@ namespace Selu383.SP25.P02.Api
             builder.Services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DataContext") ?? throw new InvalidOperationException("Connection string 'DataContext' not found.")));
 
-            builder.Services.AddIdentity<User, Role>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<DataContext>();
+            builder.Services.AddIdentity<User, Role>(options =>
+            {
+                // Set password options
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequiredLength = 8; // Minimum password length
+                options.Password.RequiredUniqueChars = 1; // Minimum number of unique characters
+
+             }).AddEntityFrameworkStores<DataContext>();
 
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
+
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
@@ -30,6 +43,7 @@ namespace Selu383.SP25.P02.Api
             {
                 var db = scope.ServiceProvider.GetRequiredService<DataContext>();
                 await db.Database.MigrateAsync();
+                await SeedUsers.SeedUsersAndRolesAsync(scope.ServiceProvider);
                 SeedTheaters.Initialize(scope.ServiceProvider);
             }
 
@@ -37,6 +51,8 @@ namespace Selu383.SP25.P02.Api
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
+                app.UseSwagger();
+                app.UseSwaggerUI();
             }
 
             app.UseHttpsRedirection();
