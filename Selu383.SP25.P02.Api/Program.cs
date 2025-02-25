@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Selu383.SP25.P02.Api.Data;
+using Selu383.SP25.P02.Api.Features;
 
 namespace Selu383.SP25.P02.Api
 {
@@ -14,6 +15,9 @@ namespace Selu383.SP25.P02.Api
             // Add services to the container.
             builder.Services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DataContext") ?? throw new InvalidOperationException("Connection string 'DataContext' not found.")));
+
+            builder.Services.AddIdentity<User, Role>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddEntityFrameworkStores<DataContext>();
 
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -37,9 +41,10 @@ namespace Selu383.SP25.P02.Api
 
             app.UseHttpsRedirection();
 
-            app.UseAuthorization();
-            app.UseAuthorization();
+            app.UseRouting();
 
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.MapControllers();
 
