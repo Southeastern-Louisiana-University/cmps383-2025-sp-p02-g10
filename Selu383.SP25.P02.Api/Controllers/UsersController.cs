@@ -16,48 +16,82 @@ namespace Selu383.SP25.P02.Api.Controllers
     public class UsersController : ControllerBase
     {
             private readonly UserManager<User> _userManager;
+            private readonly RoleManager<Role> _roleManager;
+            private readonly DataContext _context;
 
-            public UsersController(UserManager<User> userManager)
+        public UsersController(UserManager<User> userManager, RoleManager<Role> roleManager, DataContext context)
+        {
+            _userManager = userManager;
+            _roleManager = roleManager;
+            _context = context;
+        }
+
+        [HttpPost]
+ // Ensures only authenticated users can create new users
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserDto createUserDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var user = new User
             {
-                _userManager = userManager;
-            }
+                UserName = createUserDto.UserName
+            };
 
-            [HttpPost]
-            public async Task<IActionResult> CreateUser([FromBody] CreateUserDto createUserDto)
+            var result = await _userManager.CreateAsync(user, createUserDto.Password);
+
+            if (!result.Succeeded)
+                return BadRequest(result.Errors); // Return errors if creation fails
+
+            // Assign roles if provided
+            if (createUserDto.Roles != null && createUserDto.Roles.Any())
             {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
-
-                var user = new User
+                foreach (var roleName in createUserDto.Roles)
                 {
-                    UserName = createUserDto.UserName
-                };
+                    var role = await _roleManager.FindByNameAsync(roleName);
+                    if (role != null)
+                    {
+                        var userRole = new UserRole
+                        {
+                            UserId = user.Id,
+                            RoleId = role.Id
+                        };
 
-                var result = await _userManager.CreateAsync(user, createUserDto.Password);
+                        _context.UserRoles.Add(userRole);
+                    }
+                    else
+                    {
+                        return BadRequest($"Role '{roleName}' does not exist.");
+                    }
+                }
 
-                if (!result.Succeeded)
-                    return BadRequest(result.Errors); // Return errors if creation fails
-
-                return CreatedAtAction(nameof(GetUser), new { id = user.Id }, new UserDto { Id = user.Id, UserName = user.UserName });
+                await _context.SaveChangesAsync();
             }
+
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, new UserDto
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Roles = createUserDto.Roles
+            });
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUser(int id)
         {
-            // Load the user with their associated roles using eager loading
-            var user = await _userManager.Users
-                .Include(u => u.Roles)               // Eagerly load the UserRoles collection
-                .ThenInclude(ur => ur.Role)               // Eagerly load the Role associated with each UserRole
-                .FirstOrDefaultAsync(u => u.Id == id);    // Find the user by ID
+            var user = await _context.Users
+                .Include(u => u.Roles)
+                .ThenInclude(ur => ur.Role)
+                .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null)
                 return NotFound();
 
-            // Map the User and Roles to a UserDto
             var userDto = new UserDto
             {
                 Id = user.Id,
                 UserName = user.UserName,
-                Roles = user.Roles.Select(ur => ur.Role.Name).ToList()  // Map Role Names to List
+                Roles = user.Roles.Select(ur => ur.Role.Name).ToList()
             };
 
             return Ok(userDto);

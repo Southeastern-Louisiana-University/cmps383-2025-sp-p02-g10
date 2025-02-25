@@ -12,76 +12,33 @@ namespace Selu383.SP25.P02.Api.Data
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
 
-                string adminRole = "admin";
-                string adminUsername = "admin";
-                string adminPassword = "Admin@123";
+                string[] roles = { "Admin", "User" };
 
                 // Ensure the custom role exists
-                var role = await roleManager.FindByNameAsync(adminRole);
-                if (role == null)
+                foreach (var role in roles)
                 {
-                    role = new Role
+                    if (!await roleManager.RoleExistsAsync(role))
                     {
-                        Name = adminRole
-                    };
-                    var result = await roleManager.CreateAsync(role);
-                    if (result.Succeeded)
-                    {
-                        Console.WriteLine("✅ Admin role seeded successfully!");
-                    }
-                    else
-                    {
-                        Console.WriteLine("❌ Error seeding admin role:");
-                        foreach (var error in result.Errors)
-                        {
-                            Console.WriteLine($" - {error.Description}");
-                        }
+                        await roleManager.CreateAsync(new Role { Name = role });
                     }
                 }
 
-                // Check if admin user already exists
-                var adminUser = await userManager.FindByNameAsync(adminUsername);
-                if (adminUser == null)
-                {
-                    var user = new User
-                    {
-                        UserName = adminUsername
-                    };
+                await CreateUserIfNotExists(userManager, "galkadi", "Admin");
+                await CreateUserIfNotExists(userManager, "bob", "User");
+                await CreateUserIfNotExists(userManager, "sue", "User");
 
-                    var result = await userManager.CreateAsync(user, adminPassword);
-                    if (result.Succeeded)
-                    {
-                        // Manually add the UserRole association
-                        var userRole = new UserRole
-                        {
-                            UserId = user.Id,
-                            RoleId = role.Id
-                        };
 
-                        // Add UserRole to the database
-                        var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-                        dbContext.UserRoles.Add(userRole);
-                        await dbContext.SaveChangesAsync();
+            }
+        }
 
-                        // Add the role using UserManager
-                        await userManager.AddToRoleAsync(user, adminRole);
-
-                        Console.WriteLine("✅ Admin user seeded successfully!");
-                    }
-                    else
-                    {
-                        Console.WriteLine("❌ Error seeding admin user:");
-                        foreach (var error in result.Errors)
-                        {
-                            Console.WriteLine($" - {error.Description}");
-                        }
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("ℹ️ Admin user already exists.");
-                }
+        public static async Task CreateUserIfNotExists(UserManager<User> userManager, string username, string role)
+        {
+            if (await userManager.FindByNameAsync(username) == null)
+            {
+                var user = new User { UserName = username };
+                await userManager.CreateAsync(user, "Password123!");
+                await userManager.AddToRoleAsync(user, role);
             }
         }
     }
-    }   
+}
