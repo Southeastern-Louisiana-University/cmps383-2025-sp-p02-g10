@@ -13,14 +13,16 @@ namespace Selu383.SP25.P02.Api.Data
 
         public new DbSet<UserRole> UserRoles { get; set; } 
         public DbSet<Theater> Theaters { get; set; }
-
+         
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
             builder.Entity<User>().ToTable("Users");
             builder.Entity<Role>().ToTable("Roles");
-
+           
+            var userRoleBuilder = builder.Entity<UserRole>();
+            
             builder.Entity<UserRole>()
                 .ToTable("UserRoles")
                 .HasKey(ur => new { ur.UserId, ur.RoleId });
