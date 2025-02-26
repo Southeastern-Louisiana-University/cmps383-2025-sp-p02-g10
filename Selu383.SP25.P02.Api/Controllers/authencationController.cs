@@ -1,26 +1,18 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using Selu383.SP25.P02.Api.Features.Users;
-using System.Threading.Tasks;
-using Selu383.SP25.P02.Api.Features.Login;
-using Selu383.SP25.P02.Api.Features.Roles;
+using Selu383.SP25.P02.Api.Features;
+using Selu383.SP25.P02.Api.Features.DTOs;
 
 namespace Selu383.SP25.P02.Api.Controllers
 {
     [Route("api/authentication")]
     [ApiController]
-    public class AuthenticationController : Controller
+    public class AuthenticationController(SignInManager<User> signInManager, UserManager<User> userManager, RoleManager<Role> roleManager) : Controller
     {
-        private readonly SignInManager<User> _signInManager;
-        private readonly UserManager<User> _userManager;
-        private readonly RoleManager<Role> _roleManager;
-
-        public AuthenticationController(SignInManager<User> signInManager, UserManager<User> userManager)
-        {
-            _signInManager = signInManager;
-            _userManager = userManager;
-        }
+        private readonly SignInManager<User> _signInManager = signInManager;
+        private readonly UserManager<User> _userManager = userManager;
+        private readonly RoleManager<Role> _roleManager = roleManager;
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
