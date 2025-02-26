@@ -1,32 +1,23 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Selu383.SP25.P02.Api.Features.Role;
-using Selu383.SP25.P02.Api.Features.User;
-using Selu383.SP25.P02.Api.Features.UserRole;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Selu383.SP25.P02.Api.Features;
 
 namespace Selu383.SP25.P02.Api.Data
 {
     public class SeedRoles
     {
-        public static void Initialize(IServiceProvider serviceProvider)
+        public static async Task InitializeAsync(IServiceProvider serviceProvider)
         {
             using (var context = new DataContext(serviceProvider.GetRequiredService<DbContextOptions<DataContext>>()))
             {
-                // Look for any users.
-                if (context.Roles.Any())
-                {
-                    return;   // DB has been seeded
-                }
-                context.Roles.AddRange(
-                    new Role
-                    {
-                        Name = "Admin",
+                var roleManager = serviceProvider.GetRequiredService<RoleManager<Role>>();
 
-                    },
-                    new Role
-                    {
-                        Name = "User",
-                    }
-                );
+                // Seed Roles
+                if (!context.Roles.Any())
+                {
+                    await roleManager.CreateAsync(new Role { Name = "Admin" });
+                    await roleManager.CreateAsync(new Role { Name = "User" });
+                }
                 context.SaveChanges();
             }
         }

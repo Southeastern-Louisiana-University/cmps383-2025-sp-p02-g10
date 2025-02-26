@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
-namespace Selu383.SP25.P02.Api.Features
+using Selu383.SP25.P02.Api.Features.User;
+namespace Selu383.SP25.P02.Api.Features;
+
+public class UserRole : IdentityUserRole<int>
 {
-    public class UserRole : IdentityUserRole<int>
-    {
-        public User User { get; set; }
-        public Role Role { get; set; }
-    }
+    public User User { get; set; }
+    public Role Role { get; set; }
 }

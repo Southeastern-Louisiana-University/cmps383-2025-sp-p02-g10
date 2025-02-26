@@ -13,18 +13,10 @@ namespace Selu383.SP25.P02.Api.Data
         }
 
         public DbSet<Theater> Theaters { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<UserRole> UserRoles { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            base.OnModelCreating(builder);
 
-            var userRoleBuilder = builder.Entity<UserRole>();
-
-            userRoleBuilder.HasKey(x => new { x.UserId, x.RoleId });
-
-            userRoleBuilder.HasOne(x => x.Role).WithMany(x => x.Users).HasForeignKey(x => x.RoleId);
-
-            userRoleBuilder.HasOne(x => x.User).WithMany(x => x.Roles).HasForeignKey(x => x.UserId);
-        }
     }
 }
