@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -25,34 +24,6 @@ namespace Selu383.SP25.P02.Api.Migrations
                 {
                     table.PrimaryKey("PK_Theaters", x => x.Id);
                 });
-
-
-            migrationBuilder.CreateTable(
-                name: "Users",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false).Annotation("SqlServer:Identity", "1,1"),
-                    Username = table.Column<string>(type: "nvar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvar(max)", nullable: false),
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Users", x => x.Id);
-                }
-                );
-
-            migrationBuilder.CreateTable(
-                name: "Roles",
-                columns: table => new 
-                {
-                    Id = table.Column<int>(type: "int", nullable: false).Annotation("SqlServer:Identity", "1,1" ),
-                    Name = table.Column<string>(type:"nvar(max)", nullable: false),
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Roles", x => x.Id);
-                }
-                );
         }
 
         /// <inheritdoc />
@@ -61,16 +32,5 @@ namespace Selu383.SP25.P02.Api.Migrations
             migrationBuilder.DropTable(
                 name: "Theaters");
         }
-
-        //protected override void OnModelCreating(ModelBuilder builder)
-        //{
-        //    base.OnModelCreating(builder);
-
-        //    var userRoleBuilder = builder.Entity<UserRole>();
-        //    userRoleBuilder.HasKey(x => new { x.UserId, x.RoleId });
-        //    userRoleBuilder.HasOne(x => x.Role).WithMany(x => x.User).HasForeignKey(x => x.RoleId);
-
-        //    userRoleBuilder.HasOne(x => x.User).WithMany(x => x.Role).HasForeignKey(x => x.UserId);
-        //}
     }
 }

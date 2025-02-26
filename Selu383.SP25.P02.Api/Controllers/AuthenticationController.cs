@@ -29,11 +29,12 @@ namespace Selu383.SP25.P02.Api.Controllers
                 return BadRequest("Invalid username or password");
 
             var roles = await _userManager.GetRolesAsync(user);
-            return Ok(new UserDto
+
+            return Ok(new
             {
-                Id = user.Id, 
-                UserName = user.UserName,
-                //Roles = roles
+                user.Id,
+                user.UserName,
+                Roles = roles.ToArray()
             });
         }
 
@@ -52,7 +53,7 @@ namespace Selu383.SP25.P02.Api.Controllers
             {
                 Id = user.Id, 
                 UserName = user.UserName, 
-                //Roles = roles
+                Roles = roles.ToList()
             });
         }
 
