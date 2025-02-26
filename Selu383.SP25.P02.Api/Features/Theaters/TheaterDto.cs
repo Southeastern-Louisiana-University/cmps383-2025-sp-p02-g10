@@ -1,6 +1,4 @@
-﻿using Selu383.SP25.P02.Api.Features.Users;
-
-namespace Selu383.SP25.P02.Api.Features.Theaters
+﻿namespace Selu383.SP25.P02.Api.Features.Theaters
 {
     public class TheaterDto
     {
@@ -9,7 +7,6 @@ namespace Selu383.SP25.P02.Api.Features.Theaters
         public required string Address { get; set; }
 
         public int SeatCount { get; set; }
-        public int? ManagerId { get; set; }
         public User? Manager { get; set; }
     }
 }

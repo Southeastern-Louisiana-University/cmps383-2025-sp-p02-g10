@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Selu383.SP25.P02.Api.Features.UserRole;
 
 #nullable disable
 

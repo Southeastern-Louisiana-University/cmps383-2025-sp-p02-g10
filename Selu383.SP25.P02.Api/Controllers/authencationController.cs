@@ -6,7 +6,7 @@ using Selu383.SP25.P02.Api.Features.DTOs;
 
 namespace Selu383.SP25.P02.Api.Controllers
 {
-    [Route("api/authentication")]
+    [Route("api/[controller]")]
     [ApiController]
     public class AuthenticationController(SignInManager<User> signInManager, UserManager<User> userManager, RoleManager<Role> roleManager) : Controller
     {
@@ -31,9 +31,9 @@ namespace Selu383.SP25.P02.Api.Controllers
             var roles = await _userManager.GetRolesAsync(user);
             return Ok(new UserDto
             {
-                Id = user.Id.ToString(), 
+                Id = user.Id, 
                 UserName = user.UserName,
-                Roles = roles.ToArray()
+                //Roles = roles
             });
         }
 
@@ -50,9 +50,9 @@ namespace Selu383.SP25.P02.Api.Controllers
             var roles = await _userManager.GetRolesAsync(user);
             return Ok(new UserDto
             {
-                Id = user.Id.ToString(), 
+                Id = user.Id, 
                 UserName = user.UserName, 
-                Roles = roles.ToArray()
+                //Roles = roles
             });
         }
 
@@ -98,7 +98,7 @@ namespace Selu383.SP25.P02.Api.Controllers
 
             return Ok(new UserDto
             {
-                Id = user.Id.ToString(), 
+                Id = user.Id, 
                 UserName = user.UserName,
                 Roles = model.Roles
             });
