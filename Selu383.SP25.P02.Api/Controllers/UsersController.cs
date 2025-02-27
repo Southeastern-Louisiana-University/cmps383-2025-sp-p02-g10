@@ -6,8 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using Selu383.SP25.P02.Api.Data;
 using Selu383.SP25.P02.Api.Features;
 using Selu383.SP25.P02.Api.Features.DTOs;
-using static Selu383.SP25.P02.Api.Controllers.UsersController;
-
 
 namespace Selu383.SP25.P02.Api.Controllers
 {
@@ -27,6 +25,7 @@ namespace Selu383.SP25.P02.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize]
  // Ensures only authenticated users can create new users
         public async Task<IActionResult> CreateUser([FromBody] CreateUserDto createUserDto)
         {

@@ -28,6 +28,8 @@ namespace Selu383.SP25.P02.Api.Controllers
             if (!result.Succeeded)
                 return BadRequest("Invalid username or password");
 
+
+
             var roles = await _userManager.GetRolesAsync(user);
 
             return Ok(new
@@ -39,7 +41,6 @@ namespace Selu383.SP25.P02.Api.Controllers
         }
 
         [HttpGet("me")]
-        [Authorize]
         public async Task<IActionResult> GetCurrentUser()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -67,7 +68,8 @@ namespace Selu383.SP25.P02.Api.Controllers
 
         
         [HttpPost("register")]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
+
         public async Task<IActionResult> Register([FromBody] CreateUserDto model)
         {
             var userExists = await _userManager.FindByNameAsync(model.UserName);
