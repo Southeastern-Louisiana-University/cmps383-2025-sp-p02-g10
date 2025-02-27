@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Selu383.SP25.P02.Api.Data;
 using Selu383.SP25.P02.Api.Features;
 using Microsoft.OpenApi.Models;
+using System.Net;
 
 namespace Selu383.SP25.P02.Api
 {
@@ -17,17 +18,23 @@ namespace Selu383.SP25.P02.Api
             builder.Services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DataContext") ?? throw new InvalidOperationException("Connection string 'DataContext' not found.")));
 
-            builder.Services.AddIdentity<User, Role>(options =>
-            {
-                // Set password options
-                options.Password.RequireDigit = false;
-                options.Password.RequireLowercase = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequiredLength = 8; // Minimum password length
-                options.Password.RequiredUniqueChars = 1; // Minimum number of unique characters
+            builder.Services.AddIdentity<User, Role>().AddEntityFrameworkStores<DataContext>();
 
-             }).AddEntityFrameworkStores<DataContext>();
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.Events.OnRedirectToLogin = async (e) =>
+                {
+
+                    e.Response.StatusCode = 401;
+                };
+
+                options.Events.OnRedirectToAccessDenied = async (e) =>
+                {
+
+                    e.Response.StatusCode = 403;
+                };
+               
+            });
 
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
