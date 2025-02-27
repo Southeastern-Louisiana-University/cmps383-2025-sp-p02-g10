@@ -68,12 +68,12 @@ namespace Selu383.SP25.P02.Api.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, new UserDto
+            return Ok(new UserDto
             {
                 Id = user.Id,
                 UserName = user.UserName,
                 Roles = createUserDto.Roles
-            });
+            }); // Returns 200 OK instead of 201 Created
         }
 
         [HttpGet("{id}")]

@@ -39,12 +39,12 @@ namespace Selu383.SP25.P02.Api.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Admin")] // Only Admins can create theaters
         public ActionResult<TheaterDto> CreateTheater(TheaterDto dto)
         {
             if (IsInvalid(dto))
             {
-                return BadRequest();
+                return BadRequest("Invalid theater data.");
             }
 
             var theater = new Theater
@@ -64,7 +64,7 @@ namespace Selu383.SP25.P02.Api.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")] // Only Admins can create theaters
         public ActionResult<TheaterDto> UpdateTheater(int id, TheaterDto dto)
         {
             if (IsInvalid(dto))
@@ -91,7 +91,7 @@ namespace Selu383.SP25.P02.Api.Controllers
 
         [HttpDelete]
         [Route("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")] // Only Admins can create theaters
         public ActionResult DeleteTheater(int id)
         {
             var theater = theaters.FirstOrDefault(x => x.Id == id);

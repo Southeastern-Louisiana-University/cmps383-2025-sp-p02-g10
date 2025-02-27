@@ -24,16 +24,13 @@ namespace Selu383.SP25.P02.Api
             {
                 options.Events.OnRedirectToLogin = async (e) =>
                 {
-
                     e.Response.StatusCode = 401;
                 };
 
                 options.Events.OnRedirectToAccessDenied = async (e) =>
                 {
-
                     e.Response.StatusCode = 403;
-                };
-               
+                };               
             });
 
             builder.Services.AddControllers();
