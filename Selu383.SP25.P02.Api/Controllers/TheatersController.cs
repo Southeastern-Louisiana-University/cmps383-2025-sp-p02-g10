@@ -69,6 +69,7 @@ namespace Selu383.SP25.P02.Api.Controllers
 
         [HttpPut]
         [Route("{id}")]
+        [Authorize]
         public async Task<ActionResult<TheaterDto>> UpdateTheaterAsync(int id, TheaterDto dto)
         {
             if (IsInvalid(dto))
