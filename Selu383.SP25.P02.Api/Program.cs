@@ -1,6 +1,11 @@
 
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore;
 using Selu383.SP25.P02.Api.Data;
+using Selu383.SP25.P02.Api.Features;
+using Microsoft.OpenApi.Models;
+using System.Net;
 
 namespace Selu383.SP25.P02.Api
 {
@@ -14,16 +19,35 @@ namespace Selu383.SP25.P02.Api
             builder.Services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DataContext") ?? throw new InvalidOperationException("Connection string 'DataContext' not found.")));
 
+            builder.Services.AddIdentity<User, Role>().AddEntityFrameworkStores<DataContext>();
+
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.Events.OnRedirectToLogin = async (e) =>
+                {
+                    e.Response.StatusCode = 401;
+                };
+
+                options.Events.OnRedirectToAccessDenied = async (e) =>
+                {
+                    e.Response.StatusCode = 403;
+                };               
+            });
+
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
+
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
+
 
             using (var scope = app.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<DataContext>();
                 await db.Database.MigrateAsync();
+                await SeedUsers.SeedUsersAndRolesAsync(scope.ServiceProvider);
                 SeedTheaters.Initialize(scope.ServiceProvider);
             }
 
@@ -31,14 +55,34 @@ namespace Selu383.SP25.P02.Api
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
+                app.UseSwagger();
+                app.UseSwaggerUI();
             }
 
             app.UseHttpsRedirection();
 
+            app.UseRouting();
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
             app.MapControllers();
+            app.UseStaticFiles();
+
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSpa(x =>
+                {
+                    x.UseProxyToSpaDevelopmentServer("http://localhost:5173");
+                });
+            }
+            else
+            {
+
+                app.MapFallbackToFile("/index.html");
+            }
+
 
             app.Run();
         }
