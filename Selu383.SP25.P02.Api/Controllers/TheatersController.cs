@@ -56,6 +56,7 @@ namespace Selu383.SP25.P02.Api.Controllers
                 Name = dto.Name,
                 Address = dto.Address,
                 SeatCount = dto.SeatCount,
+                managerId = dto.managerId,
             };
             theaters.Add(theater);
 
@@ -82,14 +83,14 @@ namespace Selu383.SP25.P02.Api.Controllers
                 return NotFound();
             }
 
-            if (dto.Manager.Id != null)
+            if (dto.managerId != null)
             {
                 var currentUser = await _userManager.GetUserAsync(User); // Assumes a method to retrieve the logged-in user's ID
 
                 if (User.IsInRole("Admin"))
                 {
                     // Admin can always change the ManagerId
-                    theater.Manager.Id = dto.Manager.Id;
+                    theater.managerId = dto.managerId;
                 }
                 else
                 {
@@ -101,7 +102,7 @@ namespace Selu383.SP25.P02.Api.Controllers
                     else
                     {
                         // If they are the current manager, allow them to modify ManagerId (even to null)
-                        theater.Manager.Id = dto.Manager.Id;
+                        theater.managerId = dto.managerId;
                     }
                 }
             }
@@ -109,7 +110,7 @@ namespace Selu383.SP25.P02.Api.Controllers
             theater.Name = dto.Name;
             theater.Address = dto.Address;
             theater.SeatCount = dto.SeatCount;
-
+            theater.managerId = dto.managerId;
             dataContext.SaveChanges();
 
             dto.Id = theater.Id;
@@ -127,10 +128,6 @@ namespace Selu383.SP25.P02.Api.Controllers
             {
                 return NotFound();
             }
-
-            theaters.Remove(theater);
-
-            dataContext.SaveChanges();
 
             var currentUser = await _userManager.GetUserAsync(User); // Get the current logged-in user’s ID
 
