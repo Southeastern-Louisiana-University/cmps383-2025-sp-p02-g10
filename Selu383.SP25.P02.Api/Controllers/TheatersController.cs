@@ -69,7 +69,6 @@ namespace Selu383.SP25.P02.Api.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        [Authorize(Roles = "Admin")] // Only Admins can create theaters
         public async Task<ActionResult<TheaterDto>> UpdateTheaterAsync(int id, TheaterDto dto)
         {
             if (IsInvalid(dto))
@@ -95,7 +94,7 @@ namespace Selu383.SP25.P02.Api.Controllers
                 else
                 {
                     // Regular user can only change ManagerId if they are the current manager
-                    if (theater.Manager.Id != currentUser.Id)
+                    if (theater.managerId != currentUser.Id)
                     {
                         return Forbid(); // The user is not allowed to change the ManagerId
                     }
