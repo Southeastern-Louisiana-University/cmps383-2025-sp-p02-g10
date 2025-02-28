@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using Selu383.SP25.P02.Api.Features;
 using Selu383.SP25.P02.Api.Features.DTOs;
 
@@ -8,7 +8,11 @@ namespace Selu383.SP25.P02.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthenticationController(SignInManager<User> signInManager, UserManager<User> userManager, RoleManager<Role> roleManager) : Controller
+    public class AuthenticationController(
+        SignInManager<User> signInManager,
+        UserManager<User> userManager,
+        RoleManager<Role> roleManager
+    ) : Controller
     {
         private readonly SignInManager<User> _signInManager = signInManager;
         private readonly UserManager<User> _userManager = userManager;
@@ -24,20 +28,25 @@ namespace Selu383.SP25.P02.Api.Controllers
             if (user == null)
                 return BadRequest("Invalid username or password");
 
-            var result = await _signInManager.PasswordSignInAsync(user, loginDto.Password, false, false);
+            var result = await _signInManager.PasswordSignInAsync(
+                user,
+                loginDto.Password,
+                false,
+                false
+            );
             if (!result.Succeeded)
                 return BadRequest("Invalid username or password");
 
-
-
             var roles = await _userManager.GetRolesAsync(user);
 
-            return Ok(new
-            {
-                user.Id,
-                user.UserName,
-                Roles = roles.ToArray()
-            });
+            return Ok(
+                new
+                {
+                    user.Id,
+                    user.UserName,
+                    Roles = roles.ToArray(),
+                }
+            );
         }
 
         [HttpGet("me")]
@@ -50,12 +59,14 @@ namespace Selu383.SP25.P02.Api.Controllers
             }
 
             var roles = await _userManager.GetRolesAsync(user);
-            return Ok(new UserDto
-            {
-                Id = user.Id, 
-                UserName = user.UserName, 
-                Roles = roles.ToList()
-            });
+            return Ok(
+                new UserDto
+                {
+                    Id = user.Id,
+                    UserName = user.UserName,
+                    Roles = roles.ToList(),
+                }
+            );
         }
 
         [HttpPost("logout")]
@@ -66,10 +77,7 @@ namespace Selu383.SP25.P02.Api.Controllers
             return Ok();
         }
 
-        
         [HttpPost("register")]
-        [Authorize]
-
         public async Task<IActionResult> Register([FromBody] CreateUserDto model)
         {
             var userExists = await _userManager.FindByNameAsync(model.UserName);
@@ -78,17 +86,14 @@ namespace Selu383.SP25.P02.Api.Controllers
                 return BadRequest("Username already exists.");
             }
 
-            var user = new User
-            {
-                UserName = model.UserName
-            };
+            var user = new User { UserName = model.UserName };
 
             var result = await _userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
             {
                 return BadRequest(result.Errors);
             }
-            
+
             foreach (var role in model.Roles)
             {
                 if (!await _roleManager.RoleExistsAsync(role))
@@ -99,12 +104,14 @@ namespace Selu383.SP25.P02.Api.Controllers
                 await _userManager.AddToRoleAsync(user, role);
             }
 
-            return Ok(new UserDto
-            {
-                Id = user.Id, 
-                UserName = user.UserName,
-                Roles = model.Roles
-            });
+            return Ok(
+                new UserDto
+                {
+                    Id = user.Id,
+                    UserName = user.UserName,
+                    Roles = model.Roles,
+                }
+            );
         }
     }
 }

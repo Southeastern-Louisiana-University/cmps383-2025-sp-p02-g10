@@ -8,5 +8,6 @@
 
         public int SeatCount { get; set; }
         public User? Manager { get; set; }
+        public int? managerId { get; set; }
     }
 }
