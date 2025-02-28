@@ -18,5 +18,9 @@
     </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SELU383.SP25.Web\Selu383.SP25.P02.Web.esproj" />
+  </ItemGroup>
 </Project>
 
